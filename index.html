@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Pustaka</title>
+    <!-- Memuat Tailwind CSS dari CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Menggunakan CSS Variables untuk manajemen tema yang lebih bersih */
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            
+            /* --- LIGHT MODE VARIABLES (Default) --- */
+            --bg-main: #f0f4f8; /* background-color sangat terang */
+            --bg-gradient-start: #f0f4f8;
+            --bg-gradient-end: #d9e2ec;
+            --text-primary: #1f2937; /* gray-900 */
+            --text-secondary: #6b7280; /* gray-500/600 */
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb; /* gray-200 */
+            --link-preview-bg: #eff6ff; /* blue-50 */
+            --link-icon: #3b82f6; /* blue-600 */
+            --footer-border: #d1d5db; /* gray-300 */
+        }
+
+        /* --- DARK MODE STYLES --- */
+        body.dark-mode {
+            --bg-main: #1f2937; 
+            --bg-gradient-start: #111827; 
+            --bg-gradient-end: #1f2937;
+            --text-primary: #f3f4f6; /* Light Gray */
+            --text-secondary: #9ca3af; /* Gray-400 */
+            --card-bg: #374151; /* Slate-700 */
+            --card-border: #4b5563; /* Slate-600 */
+            --link-preview-bg: #4b5563; /* Slate-600 */
+            --link-icon: #93c5fd; /* Light Blue-300 */
+            --footer-border: #4b5563;
+        }
+        
+        /* Apply CSS variables to global elements */
+        body {
+            background-color: var(--bg-main);
+            background-image: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-primary);
+        }
+
+        /* Styling untuk card referensi */
+        .reference-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: var(--card-bg);
+            border-color: var(--card-border);
+            /* Pastikan teks panjang di dalam card tidak terpotong */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        .reference-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: #3b82f6; /* Border biru saat di-hover (tetap) */
+        }
+
+        /* Override specific text and component colors to use variables */
+        h1, h2 { color: var(--text-primary); }
+        .text-gray-600, .text-gray-500 { color: var(--text-secondary); }
+
+        .link-preview {
+            background-color: var(--link-preview-bg); 
+            border-color: var(--card-border);
+        }
+        .link-icon, .link-preview span {
+            color: var(--link-icon); 
+        }
+
+        /* Search Input Styling */
+        #searchInput {
+            background-color: var(--card-bg);
+            border-color: var(--card-border);
+            color: var(--text-primary);
+        }
+        /* Placeholder color */
+        #searchInput::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+        .text-gray-400 { color: var(--text-secondary); opacity: 0.8; }
+
+        /* Footer border color */
+        footer {
+            border-color: var(--footer-border);
+        }
+        
+        /* Gaya khusus untuk teks Daftar Pustaka 1 baris */
+        .citation-text {
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.4;
+            display: block; /* Agar bisa menggunakan margin */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tombol Mode Gelap (Fixed Top-Right) - Menggunakan tag <img> -->
+    <!-- CATATAN: Atribut src diatur ke nama file lokal yang Anda tentukan: dark.png dan light.png -->
+    <button id="themeToggle" class="fixed top-4 right-4 p-2 rounded-full bg-white text-gray-800 shadow-xl transition-colors duration-300 z-50 hover:bg-gray-100">
+        <!-- Icon Mode Gelap (Muncul saat Mode Terang) -->
+        <!-- Ketika mode LIGT, tampilkan icon DARK (dark.png) untuk toggle ke DARK mode -->
+        <img id="moonIcon" class="w-5 h-5" 
+             src="dark.png" 
+             alt="Dark Mode Icon" 
+             onerror="this.onerror=null; this.src='https://placehold.co/20x20/374151/FBBF24?text=DM';"
+        />
+        <!-- Icon Mode Terang (Muncul saat Mode Gelap) -->
+        <!-- Ketika mode DARK, tampilkan icon LIGHT (light.png) untuk toggle ke LIGHT mode -->
+        <img id="sunIcon" class="w-5 h-5 hidden" 
+             src="light.png" 
+             alt="Light Mode Icon" 
+             onerror="this.onerror=null; this.src='https://placehold.co/20x20/FBBF24/1F2937?text=LM';"
+        />
+    </button>
+
+    <div class="container mx-auto px-4 py-12">
+        
+        <header class="text-center mb-8">
+            <!-- H1 dan P menggunakan warna teks yang diatur oleh variabel CSS -->
+            <h1 class="text-4xl sm:text-5xl font-extrabold mb-2 tracking-tight">
+                Daftar Pustaka
+            </h1>
+            <p class="text-lg text-gray-600">
+                Kumpulan referensi dengan format penulisan 1 baris.
+            </p>
+        </header>
+
+        <!-- Input Pencarian -->
+        <div class="mb-10 max-w-2xl mx-auto">
+            <div class="relative">
+                <!-- Hapus kelas bg-white dari input -->
+                <input type="text" id="searchInput" placeholder="Cari referensi berdasarkan kata kunci atau penulis..." class="w-full p-3 pl-12 border border-gray-300 rounded-lg shadow-md focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                <!-- Icon Pencarian -->
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+        </div>
+        
+        <!-- Daftar Referensi dalam Grid Responsif -->
+        <!-- Diubah menjadi 1 kolom penuh agar daftar pustaka 1 baris terlihat rapi -->
+        <div id="references-grid" class="grid gap-4 grid-cols-1">
+            
+            <!-- CARD 1: Jurnal -->
+            <div class="reference-card border border-gray-200 rounded-xl shadow-lg hover:shadow-xl overflow-hidden" data-keywords="Pramono Jumari Adriany Water Saving Greenhouse Gas Emission Reduction Alternate Wetting and Drying Rice Field Jurnal Litbang Pertanian" id="card-1">
+                <a href="https://media.neliti.com/media/publications/374474-none-43a017d2.pdf" target="_blank" rel="noopener noreferrer" class="block">
+                    <div class="link-preview p-4 border-b border-blue-100 flex items-center justify-start">
+                        <svg class="w-6 h-6 link-icon mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <span class="text-sm font-medium hover:underline">Baca PDF</span>
+                    </div>
+                </a>
+                <div class="p-4">
+                    <p class="citation-text" id="title-1">
+                        Pramono, A., Jumari, & Adriany, T. A. (2018). THE WATER SAVING AND GREENHOUSE GAS EMISSION REDUCTION OF ALTERNATE WETTING AND DRYING ON RICE FIELD. *Jurnal Litbang Pertanian*, *37*(1), 17–26. Diperoleh dari <a href="https://media.neliti.com/media/publications/374474-none-43a017d2.pdf" class="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-100 break-all" target="_blank" rel="noopener noreferrer">https://media.neliti.com/media/publications/374474-none-43a017d2.pdf</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- CARD 2: Website Institusi Tanpa Tanggal -->
+            <div class="reference-card border border-gray-200 rounded-xl shadow-lg hover:shadow-xl overflow-hidden" data-keywords="International Rice Research Institute IRRI Alternate Wetting and Drying GHG Mitigation" id="card-2">
+                <a href="https://ghgmitigation.irri.org/mitigation-technologies/alternate-wetting-and-drying" target="_blank" rel="noopener noreferrer" class="block">
+                    <div class="link-preview p-4 border-b border-blue-100 flex items-center justify-start">
+                        <svg class="w-6 h-6 link-icon mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <span class="text-sm font-medium hover:underline">Kunjungi Laman</span>
+                    </div>
+                </a>
+                <div class="p-4">
+                    <p class="citation-text" id="title-2">
+                        International Rice Research Institute (IRRI). (n.d.). Alternate Wetting and Drying. Diperoleh dari <a href="https://ghgmitigation.irri.org/mitigation-technologies/alternate-wetting-and-drying" class="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-100 break-all" target="_blank" rel="noopener noreferrer">https://ghgmitigation.irri.org/mitigation-technologies/alternate-wetting-and-drying</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- CARD 3: Data BPS -->
+            <div class="reference-card border border-gray-200 rounded-xl shadow-lg hover:shadow-xl overflow-hidden" data-keywords="Badan Pusat Statistik Provinsi Jawa Timur Luas Lahan Sawah Kabupaten Kota Jenis Pengairan 2017" id="card-3">
+                <a href="https://jatim.bps.go.id/id/statistics-table/1/MTgzNSMx/luas-lahan-sawah-menurut-kabupaten-kota-dan-jenis-pengairan-di-provinsi-jawa-timur--hektar---2017.html" target="_blank" rel="noopener noreferrer" class="block">
+                    <div class="link-preview p-4 border-b border-blue-100 flex items-center justify-start">
+                        <svg class="w-6 h-6 link-icon mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <span class="text-sm font-medium hover:underline">Lihat Data</span>
+                    </div>
+                </a>
+                <div class="p-4">
+                    <p class="citation-text" id="title-3">
+                        Badan Pusat Statistik Provinsi Jawa Timur. (2019). Luas Lahan Sawah Menurut Kabupaten/Kota dan Jenis Pengairan di Provinsi Jawa Timur (hektar), 2017. Diperoleh dari <a href="https://jatim.bps.go.id/id/statistics-table/1/MTgzNSMx/luas-lahan-sawah-menurut-kabupaten-kota-dan-jenis-pengairan-di-provinsi-jawa-timur--hektar---2017.html" class="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-100 break-all" target="_blank" rel="noopener noreferrer">https://jatim.bps.go.id/id/statistics-table/1/MTgzNSMx/luas-lahan-sawah-menurut-kabupaten-kota-dan-jenis-pengairan-di-provinsi-jawa-timur--hektar---2017.html</a>
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+        <!-- Akhir Daftar Referensi -->
+
+        <footer class="text-center mt-12 pt-6 border-t border-gray-300">
+            <p class="text-sm text-gray-500">
+                <span class="font-bold">Catatan:</span> Klik pada area referensi untuk langsung mengunjungi tautan sumber.
+            </p>
+        </footer>
+    </div>
+
+    <!-- Script JavaScript untuk fungsi Pencarian dan Dark Mode -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- FUNGSI PENCARIAN ---
+            const searchInput = document.getElementById('searchInput');
+            const referencesGrid = document.getElementById('references-grid');
+
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.toLowerCase().trim();
+                
+                const currentCards = referencesGrid.querySelectorAll('.reference-card');
+
+                currentCards.forEach(card => {
+                    // Mengambil keywords dan teks kutipan
+                    const keywords = card.getAttribute('data-keywords').toLowerCase();
+                    const citationText = card.querySelector('.citation-text').textContent.toLowerCase();
+                    
+                    const searchableText = `${keywords} ${citationText}`;
+
+                    if (query === '' || searchableText.includes(query)) {
+                        card.style.display = 'block'; 
+                    } else {
+                        card.style.display = 'none';  
+                    }
+                });
+            });
+            
+            // --- FUNGSI DARK MODE ---
+            const themeToggle = document.getElementById('themeToggle');
+            const moonIcon = document.getElementById('moonIcon'); // Untuk mode Dark (Icon Bulan/dark.png)
+            const sunIcon = document.getElementById('sunIcon'); // Untuk mode Light (Icon Matahari/light.png)
+
+            // 1. Fungsi untuk menerapkan tema
+            function applyTheme(isDarkMode) {
+                // Tambahkan/Hapus kelas 'dark-mode' pada body
+                document.body.classList.toggle('dark-mode', isDarkMode);
+                
+                // Toggle ikon (menggunakan kelas 'hidden' pada tag <img>)
+                // Jika isDarkMode TRUE, tampilkan Sun Icon (light.png), sembunyikan Moon Icon (dark.png)
+                // Jika isDarkMode FALSE, tampilkan Moon Icon (dark.png), sembunyikan Sun Icon (light.png)
+                moonIcon.classList.toggle('hidden', isDarkMode);
+                sunIcon.classList.toggle('hidden', !isDarkMode);
+                
+                // Perbarui tombol toggle styling
+                if (isDarkMode) {
+                    // Dalam Dark Mode: Tombol jadi gelap, teks/ikon jadi terang/kuning
+                    themeToggle.classList.remove('bg-white', 'text-gray-800', 'hover:bg-gray-100');
+                    themeToggle.classList.add('bg-gray-800', 'text-yellow-400', 'hover:bg-gray-700');
+                } else {
+                    // Dalam Light Mode: Tombol jadi terang, teks/ikon jadi gelap
+                    themeToggle.classList.remove('bg-gray-800', 'text-yellow-400', 'hover:bg-gray-700');
+                    themeToggle.classList.add('bg-white', 'text-gray-800', 'hover:bg-gray-100');
+                }
+            }
+
+            // 2. Muat tema dari localStorage saat startup
+            const storedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            let initialDarkMode = false;
+            if (storedTheme === 'dark') {
+                initialDarkMode = true;
+            } else if (storedTheme === null && prefersDark) {
+                initialDarkMode = true;
+            }
+            
+            applyTheme(initialDarkMode);
+            
+            // 3. Tambahkan listener ke tombol toggle
+            themeToggle.addEventListener('click', () => {
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                const newMode = !isDarkMode;
+                
+                applyTheme(newMode);
+                // Simpan preferensi tema ke localStorage
+                localStorage.setItem('theme', newMode ? 'dark' : 'light');
+            });
+        });
+    </script>
+
+</body>
+</html>
